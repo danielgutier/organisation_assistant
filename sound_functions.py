@@ -5,7 +5,6 @@ import sys
 import keyboard
 from pydub import AudioSegment
 import os
-import create_fname
 import datetime
 
 q = queue.Queue()

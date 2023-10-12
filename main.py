@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import (QApplication,
      QMainWindow, QTabWidget)
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QFont
 
-from app_layouts import *
+from recorder import *
+from player import *
+from Parametres import *
 
 # Only needed for access to command line arguments
 import sys
@@ -12,8 +14,6 @@ import sys
 from sound_functions import *
 from keyboard import press
 from create_fname import *
-# Subclass Qwidget to customize each widget
-
 
         
 # Subclass QMainWindow to customize the application's main window
@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
 
         tabs.addTab(Record(),"Enregistrer")
         tabs.addTab(Listen(),"Reproduire")
-        tabs.addTab(Users(),"Utilisateurs")
+        tabs.addTab(Parametres(),"Paramètres")
         tabs.setFont(QFont('Helvetica',10))
 
         self.setCentralWidget(tabs)
@@ -56,7 +56,7 @@ window=MainWindow()
 window.show()  # IMPORTANT!!!!! Windows are hidden by default.
 
 # Start the event loop.
-app.exec()
+sys.exit(app.exec())
 
 
 # Your application won't reach here until you exit and the event

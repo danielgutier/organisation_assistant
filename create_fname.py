@@ -21,7 +21,7 @@ def create_fname(path,source):
     # print(current_date)
 
     # print(current_date+"_"+current_time+"_"+source)
-    return(os.path.join(os.getcwd(),path,source,str(current_date+"_"+current_time+"_"+source)))
+    return(os.path.join(os.getcwd(),path,source,str(current_date+"_"+current_time+"_"+source))), current_date, current_time, str(current_date+"_"+current_time+"_"+source), source
 
 
 #print(create_fname("test","enseignant"))

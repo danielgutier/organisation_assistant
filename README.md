@@ -13,3 +13,6 @@ Libraries to be installed (pip install)
 - keyboard
 - ffmpeg
 - (numpy ?)
+- SpeechRecognition
+- openai-whisper
+- gTTS

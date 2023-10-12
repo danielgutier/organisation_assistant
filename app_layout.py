@@ -3,9 +3,10 @@ from PyQt5.QtWidgets import (
     QWidget, QLabel, QVBoxLayout,
     QDialog, QComboBox, QDialogButtonBox    
     )
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QFont, QIcon
-import os, datetime
+from PyQt5.QtCore import (QSize, Qt, 
+    QObject, QThread, pyqtSignal)
+from PyQt5.QtGui import QFont
+import os, datetime, sound_functions, keyboard
 
 # Only needed for access to command line arguments
 
@@ -19,6 +20,14 @@ for elem in users :
 fontbig=QFont('Helvetica',15)
 fontmedium=QFont('Helvetica',12)
 fontsmall=QFont('Helvetica',10)
+
+class RecWorker(QObject):
+    rec_finished=pyqtSignal()
+    rec_progress=pyqtSignal(int)
+    def run (self,fname):
+        sound_functions.record_sound(fname)
+        self.rec_finished.emit()
+        
         
 class Record(QWidget):
     def __init__(self):
@@ -40,17 +49,15 @@ class Record(QWidget):
         #self.button_rec.setIconSize(QSize(40,40))
         #self.button_rec.setIcon(QIcon("images/pause_up.png"))
         self.button_rec.setFont(fontbig)
-        self.button_rec.button_is_checked = False
         self.button_rec.setCheckable(True)
+        self.button_rec.button_is_checked = False
         self.button_rec.clicked.connect(self.rec_was_toggled)
-
         
         # status line
         self.status = QLabel("Prêt")
         self.status.setAlignment(Qt.AlignmentFlag.AlignBottom)
         self.status.setScaledContents(True)
         self.status.setFont(fontsmall)
-        # status.setText(personne)
         
         self.layout=QVBoxLayout()
         self.layout.addWidget(self.menuderoulant)
@@ -58,17 +65,38 @@ class Record(QWidget):
         self.layout.addWidget(self.status)    
 
         self.setLayout(self.layout)        
+    
         
     def rec_was_toggled(self, checked):
         self.button_is_checked = checked
+        fname=sound_functions.create_fname(soundspath,self.menuderoulant.currentText())
+        #self.worker.rec_progress.connect(self.reportProgress)
         if checked:
+            # print(sound_functions.create_fname(soundspath,self.menuderoulant.currentText()))
             self.button_rec.setText("Arreter")
             self.status.setText("Enregistrement")
+            self.thread=QThread()
+            self.worker=RecWorker()
+            self.worker.moveToThread(self.thread)
+            self.thread.started.connect(lambda: self.worker.run(fname))
+            self.worker.rec_finished.connect(self.thread.quit)
+            self.worker.rec_finished.connect(self.worker.deleteLater)
+            self.thread.finished.connect(self.thread.deleteLater)
+            self.thread.start()
         else:
             self.button_rec.setText("Enregistrer")
             self.status.setText("Prêt")
+            keyboard.press("Enter")
+            #self.thread.stop()
             
         print("Checked ?",self.button_is_checked)
+
+        
+        #self.button_rec.setEnabled(False)
+        #self.button_stop.setEnabled(True)
+        #self.thread.finished.connect(lambda: self.button_rec.setText("Enregistrer"))
+        #self.thread.finished.connect(lambda: self.status.setText("Prêt"))
+
                 
     def index_changed(self, i): # i is an int
         print(i)
