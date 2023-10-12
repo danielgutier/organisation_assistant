@@ -10,10 +10,7 @@ from Parametres import *
 # Only needed for access to command line arguments
 import sys
 
-# Needed to control sound functions
-from sound_functions import *
 from keyboard import press
-from create_fname import *
 
         
 # Subclass QMainWindow to customize the application's main window
@@ -23,10 +20,10 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Assistant Magnetophone")
         
-        self.setMinimumSize(QSize(400, 240))
-        self.showMaximized()
+        self.setMinimumSize(QSize(800, 480))
         #self.showFullScreen()
-        #self.setMaximumSize(QSize(800, 480))
+        self.setMaximumSize(QSize(800, 480))
+        self.showMaximized()
 
         tabs = QTabWidget()
         tabs.setTabPosition(QTabWidget.TabPosition.North)

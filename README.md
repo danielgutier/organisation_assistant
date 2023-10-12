@@ -12,7 +12,7 @@ Libraries to be installed (pip install)
 - pydub
 - keyboard
 - ffmpeg
-- (numpy ?)
-- SpeechRecognition
-- openai-whisper
+- SpeechRecognition (online)
+- openai-whisper (offline)
 - gTTS
+- pyttsx3

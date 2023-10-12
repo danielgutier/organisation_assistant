@@ -8,7 +8,7 @@ from PyQt5.QtCore import (
     )
 from PyQt5.QtGui import QFont
 import os, keyboard, sys, queue
-import create_fname as create_fname
+import datetime
 import sounddevice as sd
 import soundfile as sf
 from pydub import AudioSegment
@@ -17,10 +17,6 @@ import db_manip
 
 
 soundspath=os.path.join(os.getcwd(),"sounds")
-# users=os.listdir(soundspath)
-# for elem in users :
-#     if not os.path.isdir(os.path.join(soundspath,elem)):
-#         users.remove(elem)
         
 q = queue.Queue()
 
@@ -38,10 +34,8 @@ def callback(indata, frames, time, status):
 
 class RecWorker(QObject):
     rec_finished=pyqtSignal()
-    #rec_progress=pyqtSignal(int)
     def run (self,fname):
         recording=True
-        #p=0
         print('recording : '+fname[0]+'.wav')
         with sf.SoundFile(fname[0]+'.wav', mode='x', samplerate=44100, channels=2, subtype='PCM_24') as file :
             with sd.InputStream(samplerate=44100, device=1, channels=2, callback=callback) :
@@ -49,9 +43,7 @@ class RecWorker(QObject):
                 print('press Enter to stop the recording')
                 print('#' * 50)
                 while recording :
-                    #p+=1
                     file.write(q.get())
-                    #self.rec_progress.emit(p)
                     if keyboard.is_pressed("Enter"):
                         recording=False
                         print('\nRecording finished: ' + repr(fname[0]+'.wav'))
@@ -66,16 +58,15 @@ class RecWorker(QObject):
         self.rec_finished.emit()
         
         db_manip.add_audiofile(fname)
-        
-        
+             
 class Record(QWidget):
     def __init__(self):
         super().__init__()
         
         # Menu déroulant voix
         self.menuderoulant=QComboBox()
-        
-        self.menuderoulant.addItems(db_manip.get_users())
+        users_items=db_manip.get_users()
+        self.menuderoulant.addItems(users_items)
         self.menuderoulant.setFont(fontbig)
         # Sends the current index (position) of the selected item.
         self.menuderoulant.currentIndexChanged.connect( self.index_changed )
@@ -86,14 +77,12 @@ class Record(QWidget):
         self.button_rec=QPushButton("Enregistrer")
         self.button_rec.setFont(fontbig)
         self.button_rec.setEnabled(True)
-        #self.button_rec.button_is_checked = False
         self.button_rec.clicked.connect(self.rec_was_toggled)
         
         # Button STOP
         self.button_stop=QPushButton("Arreter")
         self.button_stop.setFont(fontbig)
         self.button_stop.setEnabled(False)
-        #self.button_stop.button_is_checked = False
         self.button_stop.clicked.connect(self.stop_was_toggled)
         
         # status line
@@ -112,8 +101,20 @@ class Record(QWidget):
     
         
     def rec_was_toggled(self):
-        fname=create_fname.create_fname(soundspath,self.menuderoulant.currentText())
-        #self.button_rec.setText("Arreter")
+        # Filename creation
+        recuser=self.menuderoulant.currentText()
+        if not os.path.exists(os.path.join(os.getcwd(),soundspath)) :
+            os.mkdir(os.path.join(os.getcwd(),soundspath))
+            
+        if not os.path.exists(os.path.join(os.getcwd(),soundspath,recuser)):
+            os.mkdir(os.path.join(os.getcwd(),soundspath,recuser))
+        now=datetime.datetime.now()
+        print(type(str(now)))
+        current_time=now.strftime("%H%M%S")
+        current_date=now.strftime("%Y%m%d")
+        fname=[os.path.join(os.getcwd(),soundspath,recuser,str(current_date+"_"+current_time+"_"+recuser)), current_date, current_time, str(current_date+"_"+current_time+"_"+recuser), recuser]
+
+        # Change status bar text
         self.status.setText("Enregistrement")
         self.thread=QThread()
         self.worker=RecWorker()
@@ -122,9 +123,9 @@ class Record(QWidget):
         self.worker.rec_finished.connect(self.thread.quit)
         self.worker.rec_finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
-        #self.worker.rec_progress.connect(self.reportProgress)
         self.thread.start()
         
+        # Change button status
         self.button_rec.setEnabled(False)
         self.button_stop.setEnabled(True)
         
@@ -140,14 +141,8 @@ class Record(QWidget):
 
     def stop_was_toggled(self):
         recording = False
-        #self.status.setText("Enter appuyé")
         sleep(1)
         keyboard.press("Enter")
-        #self.status.setText("Enregistrement")
-        
-        
-    # def reportProgress(self, n):
-    #     self.status.setText(f"Enregistrement: {n}")
                 
     def index_changed(self, i): # i is an int
         print(i)
