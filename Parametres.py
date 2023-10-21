@@ -13,7 +13,10 @@ from PyQt5.QtGui import (
     )
 import soundfile as sf
 import os, datetime, db_manip, locale
-locale.setlocale(locale.LC_TIME,'fr_FR')
+# Linux based system
+locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+# Windows based system
+#locale.setlocale(locale.LC_TIME,'fr_FR')
 
 # Function to test internet connection
 import socket
