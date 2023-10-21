@@ -13,7 +13,10 @@ from sqlalchemy.orm import (DeclarativeBase,
 from datetime import datetime, date, time
 import os
 import locale
-locale.setlocale(locale.LC_TIME,'fr_FR')
+# Linux based system
+locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+# Windows based system
+#locale.setlocale(locale.LC_TIME,'fr_FR')
 
 class Base (DeclarativeBase):
     pass
