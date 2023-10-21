@@ -52,7 +52,7 @@ class Listen(QWidget):
         
         # Combobox Users
         self.menu_user=QComboBox()
-        self.menu_user.addItems(db_manip.get_users(True))
+        self.menu_user.addItems(db_manip.get_users())
         self.menu_user.setFont(fontbig)
         # Sends the current index (position) of the selected item.
         self.menu_user.currentIndexChanged.connect( self.index_changed )
