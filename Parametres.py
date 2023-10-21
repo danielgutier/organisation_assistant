@@ -11,6 +11,7 @@ from PyQt5.QtGui import (
     QFont, QPalette, 
     QColor
     )
+import soundfile as sf
 import os, datetime, db_manip, locale
 locale.setlocale(locale.LC_TIME,'fr_FR')
 
@@ -441,7 +442,7 @@ class Delete_File(QDialog):
                     fname,
                     date_time_obj.strftime("%Y%m%d"),
                     date_time_obj.strftime("%H%M%S"),
-                    db_manip.get_audiofile_name(self.menu_fichiers.currentText()).replace(".flac",""),
+                    db_manip.get_audiofile_name(self.menu_fichiers.currentText()).replace(".mp3",""),
                     self.menu_user.currentText()])
             else:
                 fname=os.path.join(textspath,self.menu_user.currentText(),db_manip.get_textfile_name(self.menu_fichiers.currentText()))
@@ -655,11 +656,14 @@ class Warning_convert(QDialog):
 
 # Convert Audio to Text function
 def convert_audiofile(fname,user,fitem):
+    nfname=fname.replace("mp3","flac")
+    data, samplerate = sf.read(fname)
+    sf.write(nfname, data, samplerate)
     if check_internet_connection():
         print ("Online")
         import speech_recognition as sr
         r = sr.Recognizer()
-        with sr.AudioFile(fname) as source:
+        with sr.AudioFile(nfname) as source:
             # listen for the data (load audio to memory)
             audio_data = r.record(source)
             # recognize (convert from speech to text)
@@ -668,24 +672,26 @@ def convert_audiofile(fname,user,fitem):
         print("Offline")
         import whisper
         model = whisper.load_model("base")
-        result = model.transcribe(fname)
-        text=result["text"] 
+        result = model.transcribe(nfname)
+        text=result["text"]
+    if os.path.exists(nfname) :
+        os.remove(nfname)
     if not os.path.exists(os.path.join(os.getcwd(),"texts")) :
         os.mkdir (os.path.join(os.getcwd(),"texts"))
     if not os.path.exists(os.path.join(os.getcwd(),"texts",user)):
         os.mkdir(os.path.join(os.getcwd(),"texts",user))
     tfname=fname.replace("sounds","texts")
-    tfname=tfname.replace("flac","txt")
+    tfname=tfname.replace("mp3","txt")
     text_file = open(tfname, "w")
     text_file.write(text)
     text_file.close()
     date_time_obj=datetime.datetime.strptime(fitem,"%A %d %B %Y à %H:%M:%S")
 
     db_manip.add_textfile([
-        os.path.join(textspath,user,db_manip.get_audiofile_name(fitem)).replace("flac","txt"),
+        os.path.join(textspath,user,db_manip.get_audiofile_name(fitem)).replace("mp3","txt"),
         date_time_obj.strftime("%Y%m%d"),
         date_time_obj.strftime("%H%M%S"),
-        db_manip.get_audiofile_name(fitem).replace(".flac",""),
+        db_manip.get_audiofile_name(fitem).replace(".mp3",""),
         user
         ])
     
@@ -693,7 +699,7 @@ def convert_audiofile(fname,user,fitem):
         os.path.join(soundspath,user,db_manip.get_audiofile_name(fitem)),
         date_time_obj.strftime("%Y%m%d"),
         date_time_obj.strftime("%H%M%S"),
-        db_manip.get_audiofile_name(fitem).replace(".flac",""),
+        db_manip.get_audiofile_name(fitem).replace(".mp3",""),
         user])
     
     os.remove(fname)

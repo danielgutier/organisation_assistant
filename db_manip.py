@@ -66,7 +66,7 @@ class Text_Files (Base):
 
 # ORM Engine initialisation
 def initdb():
-    dbname="assistant_dbase.db"
+    dbname="test_dbase.db"
     engine = create_engine("sqlite:///"+dbname, echo=True)
     if os.path.exists(dbname):
         print ("DB already exists")
@@ -140,7 +140,7 @@ def add_audiofile (fname):
         user1.audio_fn.append(Audio_Files(
             audio_date=fname[1],
             audio_time=fname[2],
-            audio_fname=fname[3]+".flac",
+            audio_fname=fname[3]+".mp3",
         ))
         session.commit()
         

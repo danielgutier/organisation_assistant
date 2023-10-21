@@ -7,11 +7,12 @@ from PyQt5.QtCore import (
     QThread, pyqtSignal
     )
 from PyQt5.QtGui import QFont
-import os, keyboard, sys, queue
+#from pynput import keyboard
+#from pynput.keyboard import Key, Controller
+import os, sys, queue
 import datetime
 import sounddevice as sd
-import soundfile as sf
-from pydub import AudioSegment
+import soundfile as sf #from pydub import AudioSegment
 from time import sleep
 import db_manip
 
@@ -35,23 +36,35 @@ def callback(indata, frames, time, status):
 class RecWorker(QObject):
     rec_finished=pyqtSignal()
     def run (self,fname):
-        recording=True
-        print('recording : '+fname[0]+'.wav')
-        with sf.SoundFile(fname[0]+'.wav', mode='x', samplerate=44100, channels=2, subtype='PCM_24') as file :
-            with sd.InputStream(samplerate=44100, device=1, channels=2, callback=callback) :
-                print('#' * 50)
-                print('press Enter to stop the recording')
-                print('#' * 50)
-                while recording :
-                    file.write(q.get())
-                    if keyboard.is_pressed("Enter"):
-                        recording=False
-                        print('\nRecording finished: ' + repr(fname[0]+'.wav'))
-                        
-        print("Converting file "+fname[0]+'.wav'+" ---> "+fname[0]+'.flac')
-        sound = AudioSegment.from_file(fname[0]+'.wav', format="wav")
-        sound.export(fname[0]+'.flac',format = "flac")
-        if os.path.exists(fname[0]+'.flac') :
+        try:
+        #recording=True
+            print('recording : '+fname[0]+'.wav')
+            #for device in sd.query_devices():
+            #    if 'USB' in device["name"] and device["max_input_channels"]==1:
+            #        dn=int(device["index"])
+            #        srate=int(device["default_samplerate"])
+            with sf.SoundFile(fname[0]+'.wav', mode='x', samplerate=44100,
+                          channels=1, subtype=None) as file :
+                with sd.InputStream(samplerate=44100, device=None,
+                                channels=1, callback=callback) :
+                    print('#' * 50)
+                    print('press Enter to stop the recording')
+                    print('#' * 50)
+                    while True :
+                        file.write(q.get())
+                        #with keyboard.Listener(on_press=on_press,on_release=on_release) as listener:
+                        #    listener.join()
+                        #if keyboard.is_pressed("Enter"):
+                        #recording=False
+                        #print('\nRecording finished: ' + repr(fname[0]+'.wav'))
+        except KeyboardInterrupt:
+            print('\nRecording finished: ' + repr(fname[0]+'.wav'))
+        except Exception as e:
+            print(e)               
+        print("Converting file "+fname[0]+'.wav'+" ---> "+fname[0]+'.mp3')
+        data, samplerate = sf.read(fname[0]+'.wav')
+        sf.write(fname[0]+'.mp3', data, samplerate)
+        if os.path.exists(fname[0]+'.mp3') :
             os.remove(fname[0]+'.wav')
         print("Converting finished")
         
@@ -140,9 +153,9 @@ class Record(QWidget):
         )
 
     def stop_was_toggled(self):
-        recording = False
+        #recording = False
         sleep(1)
-        keyboard.press("Enter")
+        #keyboard.press("Enter")
                 
     def index_changed(self, i): # i is an int
         print(i)

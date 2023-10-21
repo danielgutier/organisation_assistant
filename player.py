@@ -7,12 +7,16 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
 # Import file, date, language and database functions  
-import os, datetime, locale, db_manip
+import os, datetime, locale, db_manip, numpy
+# Linux based system
+#locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+# Windows based system
 locale.setlocale(locale.LC_TIME,'fr_FR')
 
 # Import sound playing modules
 import sounddevice as sd
-import soundfile as sf
+#import soundfile as sf
+from playsound import playsound
 
 # Import text to speech modules
 import pyttsx3 # offline
@@ -136,9 +140,11 @@ class Listen(QWidget):
         self.status.setText("Écoute")
         self.button_stop.setEnabled(True)
         sound_fname=os.path.join(soundspath,self.menu_user.currentText(),db_manip.get_audiofile_name(self.menu_fichiers_audio.currentText()))
-        data, fs = sf.read(sound_fname)
-        sd.play(data, fs)
-        sd.wait()
+        print(sound_fname)
+        playsound(sound_fname)
+        #data, fs = sf.read(sound_fname)
+        #sd.play(data, fs)
+        #sd.wait()
         
     def play_was_toggled_text(self):
         self.button_play_audio.setEnabled(False)
@@ -150,20 +156,22 @@ class Listen(QWidget):
             mytext = f.readlines()
         f.close()
         print(mytext[0])
+        
         if check_internet_connection():
             print ("Online")
             myobj = gTTS(text=mytext[0], lang='fr', slow=False)
             # Saving the converted audio 
             myobj.save("temp.mp3")
             # Playing the converted file
-            data, fs = sf.read("temp.mp3")
-            sd.play(data, fs)
-            sd.wait()
+            playsound('temp.mp3')
+            #data, fs = sf.read("temp.mp3")
+            #sd.play(data, fs)
+            #sd.wait()
         else:
             print("Offline")
             engine = pyttsx3.init()
-            voice = engine.getProperty('voices')[2]
-            engine.setProperty('voice', voice.id)
+            #voice = engine.getProperty('voices')[2]
+            engine.setProperty('voice', "french")
             engine.setProperty('rate',130)
             engine.say(mytext[0])
             engine.runAndWait()
@@ -176,7 +184,6 @@ class Listen(QWidget):
             
                 
     def index_changed(self, i): # i is an int
-        self.menu_fichiers_audio.clear()
         print("index",i)
         self.menu_fichiers_audio.clear()
         current_user=db_manip.get_audiodates(self.menu_user.currentText())
@@ -195,6 +202,7 @@ class Listen(QWidget):
         self.menu_fichiers_text.addItems(text_items)
 
     def text_changed(self, s): # s is a str
+        
         print(s)
         
     def file_ind_changed(self, i): # i is an int

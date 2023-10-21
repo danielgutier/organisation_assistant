@@ -15,14 +15,20 @@ import soundfile as sf
 
 #import pyttsx3
 import warnings
-warnings.filterwarnings("ignore", message=".*The 'nopython' keyword.*")
-filename = "20230921_143423_Enseignant.flac"
+#warnings.filterwarnings("ignore", message=".*The 'nopython' keyword.*")
+filename = "20230921_143423_Enseignant.mp3"
+nfilename=filename.replace("mp3","flac")
+data, samplerate = sf.read(filename)
+sf.write(nfilename, data, samplerate)
+print("Converting finished")
+
+print(nfilename)
 
 # Online solution
 # initialize the recognizer
 r = sr.Recognizer()
 
-with sr.AudioFile(filename) as source:
+with sr.AudioFile(nfilename) as source:
     # listen for the data (load audio to memory)
     audio_data = r.record(source)
     # recognize (convert from speech to text)
@@ -31,10 +37,11 @@ with sr.AudioFile(filename) as source:
 
 #offline solution
 model = whisper.load_model("base")
-result = model.transcribe(filename)
+result = model.transcribe(nfilename)
 print("Whisper : "+ result["text"])
 
-
+if os.path.exists(nfilename) :
+    os.remove(nfilename)
 """
 # The text that you want to convert to audio
 with open ("D:/Users/braik/Documents/GymInf/Memoire/Git/organisation_assistant/texts/Père/20230927_172102_Père.txt",'r') as f:
