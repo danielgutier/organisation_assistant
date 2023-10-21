@@ -12,7 +12,8 @@ from PyQt5.QtGui import QFont
 import os, sys, queue
 import datetime
 import sounddevice as sd
-import soundfile as sf #from pydub import AudioSegment
+import soundfile as sf 
+from pydub import AudioSegment
 from time import sleep
 import db_manip
 
@@ -62,8 +63,8 @@ class RecWorker(QObject):
         except Exception as e:
             print(e)               
         print("Converting file "+fname[0]+'.wav'+" ---> "+fname[0]+'.mp3')
-        data, samplerate = sf.read(fname[0]+'.wav')
-        sf.write(fname[0]+'.mp3', data, samplerate)
+        sound = AudioSegment.from_wav(fname[0]+'.wav')
+        sound.export(fname[0]+'.mp3', format='mp3')
         if os.path.exists(fname[0]+'.mp3') :
             os.remove(fname[0]+'.wav')
         print("Converting finished")
