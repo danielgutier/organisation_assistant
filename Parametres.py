@@ -11,7 +11,6 @@ from PyQt5.QtGui import (
     QFont, QPalette, 
     QColor
     )
-import soundfile as sf
 import os, datetime, db_manip, locale
 # Linux based system
 #locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
@@ -661,8 +660,8 @@ class Warning_convert(QDialog):
 # Convert Audio to Text function
 def convert_audiofile(fname,user,fitem):
     nfname=fname.replace("mp3","flac")
-    data, samplerate = sf.read(fname)
-    sf.write(nfname, data, samplerate)
+    sfile = AudioSegment.from_mp3(fname)
+    sfile.export(nfname, format = "flac")
     if check_internet_connection():
         print ("Online")
         import speech_recognition as sr
