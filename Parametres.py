@@ -11,6 +11,7 @@ from PyQt5.QtGui import (
     QFont, QPalette, 
     QColor
     )
+from pydub import AudioSegment
 import os, datetime, db_manip, locale
 # Linux based system
 #locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
