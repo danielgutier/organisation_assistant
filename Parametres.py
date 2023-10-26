@@ -14,9 +14,9 @@ from PyQt5.QtGui import (
 import soundfile as sf
 import os, datetime, db_manip, locale
 # Linux based system
-locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+#locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
 # Windows based system
-#locale.setlocale(locale.LC_TIME,'fr_FR')
+locale.setlocale(locale.LC_TIME,'fr_FR')
 
 # Function to test internet connection
 import socket
@@ -234,6 +234,7 @@ class Add_User(QDialog):
             pal.setColor(QPalette.WindowText, QColor("red"))
             self.message_user.setPalette(pal)
             self.message_user.setText("Nom d'utilisateur ne doit pas être vide")
+        
     def reject(self) -> None:
         return super().reject()
 

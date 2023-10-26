@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlalchemy import (ForeignKey,
                         String,
                         create_engine,
-                        select, inspect
+                        select
 )
 from sqlalchemy.orm import (DeclarativeBase,
                             Mapped,
@@ -14,9 +14,9 @@ from datetime import datetime, date, time
 import os
 import locale
 # Linux based system
-locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+#locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
 # Windows based system
-#locale.setlocale(locale.LC_TIME,'fr_FR')
+locale.setlocale(locale.LC_TIME,'fr_FR')
 
 class Base (DeclarativeBase):
     pass
@@ -69,7 +69,7 @@ class Text_Files (Base):
 
 # ORM Engine initialisation
 def initdb():
-    dbname="test_dbase.db"
+    dbname="db_assistant.db"
     engine = create_engine("sqlite:///"+dbname, echo=True)
     if os.path.exists(dbname):
         print ("DB already exists")
@@ -110,7 +110,6 @@ def del_user (deluser):
 def get_users(withfiles=False):
     engine=initdb()
     userlist=list()
-    #print(inspect(engine).get_table_names)
     
     with Session(engine) as session:
         users_list = select(User)

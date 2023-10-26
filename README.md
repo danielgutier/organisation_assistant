@@ -10,7 +10,7 @@ Libraries to be installed (pip install)
 - sounddevice
 - soundfile
 - pydub
-- keyboard
+- playsound
 - ffmpeg
 - SpeechRecognition (online)
 - openai-whisper (offline)

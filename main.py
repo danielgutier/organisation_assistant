@@ -9,9 +9,6 @@ from Parametres import *
 
 # Only needed for access to command line arguments
 import sys
-
-from keyboard import press
-
         
 # Subclass QMainWindow to customize the application's main window
 class MainWindow(QMainWindow):
@@ -25,17 +22,18 @@ class MainWindow(QMainWindow):
         self.setMaximumSize(QSize(800, 480))
         self.showMaximized()
 
-        tabs = QTabWidget()
-        tabs.setTabPosition(QTabWidget.TabPosition.North)
-        tabs.setTabShape(QTabWidget.TabShape.Triangular)
-        tabs.setMovable(True)
+        self.tabs = QTabWidget()
+        self.tabs.setTabPosition(QTabWidget.TabPosition.North)
+        self.tabs.setTabShape(QTabWidget.TabShape.Triangular)
+        self.tabs.setMovable(True)
+        #self.tabs.currentChanged.connect(self.onTabChange)
 
-        tabs.addTab(Record(),"Enregistrer")
-        tabs.addTab(Listen(),"Reproduire")
-        tabs.addTab(Parametres(),"Paramètres")
-        tabs.setFont(QFont('Helvetica',10))
+        self.tabs.addTab(Record(),"Enregistrer")
+        self.tabs.addTab(Listen(),"Reproduire")
+        self.tabs.addTab(Parametres(),"Paramètres")
+        self.tabs.setFont(QFont('Helvetica',10))
 
-        self.setCentralWidget(tabs)
+        self.setCentralWidget(self.tabs)
         
 # You need one (and only one) QApplication instance per application.
 # Pass in sys.argv to allow command line arguments for your app.
