@@ -140,6 +140,7 @@ class Listen(QWidget):
             
         self.button_play_audio.setEnabled(True)
         self.button_play_text.setEnabled(True)
+        self.status.setText("Prêt")
         
     def play_was_toggled_text(self):
         if self.menu_fichiers_text.currentText():
@@ -173,6 +174,7 @@ class Listen(QWidget):
             
         self.button_play_audio.setEnabled(True)
         self.button_play_text.setEnabled(True)
+        self.status.setText("Prêt")
         
     def index_changed(self, i): # i is an int
         print("index",i)

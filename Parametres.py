@@ -279,38 +279,46 @@ class Remove_User(QDialog):
         self.setLayout(self.layout)
         
     def accept(self) -> None:
-        if db_manip.get_audiodates(self.menu_user.currentText()) and db_manip.get_textdates(self.menu_user.currentText()) :
+        if db_manip.get_audiodates(self.menu_user.currentText()) or db_manip.get_textdates(self.menu_user.currentText()) :
             dlg = Warning_files()
             dlg.setMinimumSize(QSize(400, 240))
             dlg.setMaximumSize(QSize(800, 480))
             if dlg.exec():
+                for elem in db_manip.get_audiodates(self.menu_user.currentText()):
+                    if not elem:
+                        sound_fname=os.path.join(
+                            soundspath,
+                            self.menu_user.currentText(),
+                            db_manip.get_audiofile_name(datetime.datetime.combine(elem[0],elem[1]).strftime("%A %d %B %Y à %H:%M:%S")))
+                        os.remove(sound_fname)
+                        os.remove(os.path.join(soundspath,self.menu_user.currentText()))
+                        fname=[sound_fname.replace(".mp3",""),
+                            elem[0].strftime("%Y%m%d"), 
+                            elem[1].strftime("%H%M%S"),
+                            str(elem[0].strftime("%Y%m%d"))+"_"+str(elem[1].strftime("%H%M%S"))+"_"+self.menu_user.currentText(),
+                            self.menu_user.currentText()]
+                        db_manip.del_audiofile(fname)
+                for elem in db_manip.get_textdates(self.menu_user.currentText()):
+                    if not elem:
+                        text_fname=os.path.join(
+                            textspath,
+                            self.menu_user.currentText(),
+                            db_manip.get_textfile_name(datetime.datetime.combine(elem[0],elem[1]).strftime("%A %d %B %Y à %H:%M:%S")))
+                        os.remove(text_fname)
+                        os.remove(os.path.join(textspath,self.menu_user.currentText()))
+                        fname=[text_fname.replace(".txt",""),
+                            elem[0].strftime("%Y%m%d"), 
+                            elem[1].strftime("%H%M%S"),
+                            str(elem[0].strftime("%Y%m%d"))+"_"+str(elem[1].strftime("%H%M%S"))+"_"+self.menu_user.currentText(),
+                            self.menu_user.currentText()]
+                        db_manip.del_audiofile(fname)
                 print("Remove all files and user")
+                db_manip.del_user(self.menu_user.currentText())
                 return super().accept()
             else:
                 print("Cancel!")
-                return super().reject()
-                
-        elif db_manip.get_audiodates(self.menu_user.currentText()) :
-            dlg = Warning_files()
-            dlg.setMinimumSize(QSize(400, 240))
-            dlg.setMaximumSize(QSize(800, 480))
-            if dlg.exec():
-                print("Remove audio files and user")
-                return super().accept()
-            else:
-                print("Cancel!")
-                return super().reject()
+                return super().reject()      
 
-        elif db_manip.get_textdates(self.menu_user.currentText()) :
-            dlg = Warning_files()
-            dlg.setMinimumSize(QSize(400, 240))
-            dlg.setMaximumSize(QSize(800, 480))
-            if dlg.exec():
-                print("Remove text files and user")
-                return super().accept()
-            else:
-                print("Cancel!")
-                return super().reject()
         else:
             print ("Remove User")
             db_manip.del_user(self.menu_user.currentText())
