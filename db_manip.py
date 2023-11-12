@@ -14,9 +14,9 @@ from datetime import datetime, date, time
 import os
 import locale
 # Linux based system
-#locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
 # Windows based system
-locale.setlocale(locale.LC_TIME,'fr_FR')
+# locale.setlocale(locale.LC_TIME,'fr_FR')
 
 class Base (DeclarativeBase):
     pass

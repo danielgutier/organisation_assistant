@@ -13,6 +13,5 @@ Libraries to be installed (pip install)
 - playsound
 - ffmpeg
 - SpeechRecognition (online)
-- openai-whisper (offline)
 - gTTS
 - pyttsx3

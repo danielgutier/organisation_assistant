@@ -14,9 +14,9 @@ from PyQt5.QtGui import (
 from pydub import AudioSegment
 import os, datetime, db_manip, locale
 # Linux based system
-#locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
 # Windows based system
-locale.setlocale(locale.LC_TIME,'fr_FR')
+# locale.setlocale(locale.LC_TIME,'fr_FR')
 
 # Function to test internet connection
 import socket
@@ -69,20 +69,29 @@ class Parametres(QWidget):
         self.button_delete_text.setFont(fontbig)
         self.button_delete_text.clicked.connect(self.button_delete_text_was_toggled)
         
+        online_flag=check_internet_connection()
         # Convert label
-        self.text_convert_audiofiles=QLabel("Convertir des fichiers audio")
+        self.text_convert_audiofiles=QLabel("Convertir des fichiers audio - seulement en ligne")
         self.text_convert_audiofiles.setScaledContents(True)
         self.text_convert_audiofiles.setFont(fontmedium)
         
         # Button Convert from Date
         self.button_convert=QPushButton("Convertir un fichier audio")
+        self.button_convert.setEnabled(online_flag)
         self.button_convert.setFont(fontbig)
         self.button_convert.clicked.connect(self.convert_was_toggled)
         
         # Button Convert from Date
         self.button_convert_date=QPushButton("Convertir plusieurs fichiers audio")
+        self.button_convert_date.setEnabled(online_flag)
         self.button_convert_date.setFont(fontbig)
         self.button_convert_date.clicked.connect(self.convertdate_was_toggled)
+        
+        # Buttom Rafraichir
+        self.button_refresh=QPushButton("Rafraichir")
+        self.button_refresh.setFont(fontbig)
+        self.button_refresh.setEnabled(True)
+        self.button_refresh.clicked.connect(self.refresh_was_toggled)
 
         # status line
         self.status = QLabel("Prêt")
@@ -100,9 +109,15 @@ class Parametres(QWidget):
         self.layout.addWidget(self.text_convert_audiofiles)
         self.layout.addWidget(self.button_convert)
         self.layout.addWidget(self.button_convert_date)
+        self.layout.addWidget(self.button_refresh)
         self.layout.addWidget(self.status)    
 
-        self.setLayout(self.layout)        
+        self.setLayout(self.layout)
+        
+    def refresh_was_toggled(self):
+        online_flag=check_internet_connection()
+        self.button_convert.setEnabled(online_flag)
+        self.button_convert_date.setEnabled(online_flag)       
         
     def add_was_clicked(self, s):
         print("Checked ?",s)
@@ -671,21 +686,16 @@ def convert_audiofile(fname,user,fitem):
     nfname=fname.replace("mp3","flac")
     sfile = AudioSegment.from_mp3(fname)
     sfile.export(nfname, format = "flac")
-    if check_internet_connection():
-        print ("Online")
-        import speech_recognition as sr
-        r = sr.Recognizer()
-        with sr.AudioFile(nfname) as source:
-            # listen for the data (load audio to memory)
-            audio_data = r.record(source)
-            # recognize (convert from speech to text)
-            text = r.recognize_google(audio_data,language="fr-FR")
-    else:
-        print("Offline")
-        import whisper
-        model = whisper.load_model("base")
-        result = model.transcribe(nfname)
-        text=result["text"]
+
+    print ("Online")
+    import speech_recognition as sr
+    r = sr.Recognizer()
+    with sr.AudioFile(nfname) as source:
+        # listen for the data (load audio to memory)
+        audio_data = r.record(source)
+        # recognize (convert from speech to text)
+        text = r.recognize_google(audio_data,language="fr-FR")
+
     if os.path.exists(nfname) :
         os.remove(nfname)
     if not os.path.exists(os.path.join(os.getcwd(),"texts")) :

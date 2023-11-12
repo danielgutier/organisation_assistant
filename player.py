@@ -10,9 +10,9 @@ from PyQt5.QtGui import QFont
 # Import file, date, language and database functions  
 import os, datetime, locale, db_manip
 # Linux based system
-#locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
 # Windows based system
-locale.setlocale(locale.LC_TIME,'fr_FR')
+# locale.setlocale(locale.LC_TIME,'fr_FR')
 
 # Import sound playing modules
 import sounddevice as sd

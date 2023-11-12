@@ -14,9 +14,9 @@ import soundfile as sf
 from pydub import AudioSegment
 import db_manip
 # Linux based system
-#locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
+locale.setlocale(locale.LC_TIME,'fr_CH.utf8')
 # Windows based system
-locale.setlocale(locale.LC_TIME,'fr_FR')
+# locale.setlocale(locale.LC_TIME,'fr_FR')
 
 
 soundspath=os.path.join(os.getcwd(),"sounds")
